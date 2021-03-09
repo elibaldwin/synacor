@@ -10,7 +10,7 @@ const graph_options = {
     color: "#000000"
   },
   physics: {
-    enabled: false
+    enabled: true
   }
 };
 
@@ -152,6 +152,9 @@ class App extends Component {
           fetch('/vm/inv')
             .then(response => response.json())
             .then(state => this.setState(state));
+          fetch(`/vm?command=look`)
+            .then(response => response.json())
+            .then(state => this.setState(state));
         }
       });
   }
@@ -210,7 +213,7 @@ class App extends Component {
                 {exits}
               </ul>
             </div>
-            <div className="console" style={{flexGrow: 1}}>
+            <div className="console" style={{flexGrow: 3}}>
               <h2>info</h2>
               <p style={{fontSize: 16}}>{this.state.message}</p>
             </div>

@@ -6,7 +6,7 @@
 int main() {
   SynacorVM vm = SynacorVM();
   vm.load("challenge.bin");
-  //std::cout << vm.execute("");
+  std::cout << vm.getState();
 
   string in_line;
   while (getline(std::cin, in_line)) {
