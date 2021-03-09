@@ -1,0 +1,76 @@
+body {
+  font-family: "Lucida Console";
+}
+
+.flex-container {
+  display: flex;
+}
+
+.row {
+  flex-direction: row;
+}
+
+.col {
+  flex-direction: column;
+  background-color: rgb(245, 245, 245);
+  margin: 5px;
+}
+
+.col > div {
+  margin: 8px;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 0px 18px;
+}
+
+.history {
+  overflow-y: scroll;
+}
+
+.console {
+  white-space: pre-line;
+  overflow-y: scroll;
+}
+
+button {
+  border: none;
+  text-align: center;
+  padding: 6px 12px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-family: "Lucida Console";
+  font-size: 18px;
+  transition-duration: 0.2s;
+}
+
+button:focus {
+  outline: 0;
+}
+
+li {
+  margin-top: 3px;
+}
+
+.item {
+  background-color: honeydew;
+}
+
+.item:hover {
+  background-color: rgb(195, 255, 195);
+}
+
+.exit {
+  background-color: honeydew;
+}
+
+.exit:hover {
+  background-color: rgb(195, 255, 195);
+}
+
+.hitem {
+  background: rgb(255, 251, 240);
+}
+
+.hitem:hover {
+  background: rgb(255, 239, 193);
+}

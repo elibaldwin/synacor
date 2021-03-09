@@ -41,10 +41,18 @@ class SynacorVM {
 
   vector<snapshot> history;
 
+  string str_state;
+
+  bool used_teleporter = false;
+
   public:
-    SynacorVM(string bin_path);      // construct VM using binary code file at bin_path
+    SynacorVM();                     // construct VM using binary code file at bin_path
+    void load(string bin_path);
     string execute(string command);  // execute 'command' as input, return output
     string undo();                   // make one step back into state history
+    string getState();               // get current string representing state
+    string reset();                  // reset to first history state, return initial message
+    string revert(int step);
   
   private:
     bool step();

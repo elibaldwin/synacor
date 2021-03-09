@@ -1,18 +1,21 @@
 #include "synacor_vm.h"
 
-using std::ifstream;
-using std::cout;
-using std::cin;
-using std::endl;
-
-SynacorVM::SynacorVM(string bin_path) : ip(0), sp(0) {
-  ifstream infile(bin_path);
-  infile.read((char*) mem.data(), 65536);
-
+SynacorVM::SynacorVM() : ip(0), sp(0) {
   reg.fill(0);
   stack.fill(0);
+}
 
-  cout << "initialized vm with " << infile.gcount() << " bytes read from " << bin_path << " into memory." << endl;
+void SynacorVM::load(string bin_path) {
+  std::ifstream infile(bin_path);
+  infile.read((char*) mem.data(), mem.size() * sizeof(uint16_t));
+
+  inp_stream = istringstream();
+  out_stream = ostringstream();
+
+  // step until vm is waiting for new input (or halts)
+  while(step() && mem[ip]);
+
+  str_state = out_stream.str();
 }
 
 string SynacorVM::execute(string command) {
@@ -20,16 +23,18 @@ string SynacorVM::execute(string command) {
   if (command.size() > 0 && command[command.size()-1] != '\n')
     command += '\n';
   
-  snapshot state;
-  state.command = command;
-  state.output = out_stream.str();
-  state.ip = ip;
-  state.sp = sp;
-  state.reg = reg;
-  state.stack = stack;
-  state.mem = mem;
+  if (!(command == "inv\n" || command == "look\n")) {
+    snapshot state;
+    state.command = command;
+    state.output = str_state;
+    state.ip = ip;
+    state.sp = sp;
+    state.reg = reg;
+    state.stack = stack;
+    state.mem = mem;
 
-  history.push_back(state);
+    history.push_back(state);
+  }
 
   inp_stream = istringstream(command);
   out_stream = ostringstream();
@@ -37,7 +42,17 @@ string SynacorVM::execute(string command) {
   // step until vm is waiting for new input (or halts)
   while(step() && mem[ip]);
 
-  return out_stream.str();
+  if (command == "use teleporter\n") {
+    used_teleporter = true;
+  }
+
+  if (command == "inv\n" || command == "look\n") {
+    return out_stream.str(); // don't save output for actions that don't modify state
+  }
+
+  str_state = out_stream.str();
+
+  return str_state;
 }
 
 string SynacorVM::undo() {
@@ -49,9 +64,54 @@ string SynacorVM::undo() {
   stack = state.stack;
   mem = state.mem;
 
+  str_state = state.output;
+
   history.pop_back();
 
-  return state.output;
+  return str_state;
+}
+
+string SynacorVM::revert(int step) {
+  if (step >= history.size())
+    return str_state;
+  
+  snapshot state = history[step];
+
+  ip = state.ip;
+  sp = state.sp;
+  reg = state.reg;
+  stack = state.stack;
+  mem = state.mem;
+
+  str_state = state.output;
+
+  history.resize(step);
+
+  return str_state;
+}
+
+string SynacorVM::getState() {
+  return str_state;
+}
+
+string SynacorVM::reset() {
+  if (history.size() == 0) {
+    return str_state;
+  }
+
+  snapshot state = history[0];
+
+  ip = state.ip;
+  sp = state.sp;
+  reg = state.reg;
+  stack = state.stack;
+  mem = state.mem;
+
+  str_state = state.output;
+
+  history = vector<snapshot>();
+
+  return str_state;
 }
 
 uint16_t SynacorVM::get(uint16_t addr) {
@@ -60,8 +120,7 @@ uint16_t SynacorVM::get(uint16_t addr) {
   if (val & 0x8000) {
     // val refers to a register (first bit is set)
     if ((val & 0x7FFF) > 7) {
-      cout << "invalid value " << val << " at address " << addr << "." << endl;
-      cout << (val & 0x7FFF);
+      std::cout << "invalid value " << val << " at address " << addr << "." << std::endl;
       exit(1);
     }
     return reg[val & 0x7FFF];
@@ -72,6 +131,17 @@ uint16_t SynacorVM::get(uint16_t addr) {
 }
 
 bool SynacorVM::step() {
+  if (used_teleporter) {
+    if (ip == 5451) {
+      reg[7] = 25734;
+    }
+
+    if (ip == 5489) {
+      reg[0] = 6;
+      ip+=2;
+    }
+  }
+
   uint16_t op = mem[ip];
 
   switch (op) {
@@ -194,19 +264,4 @@ bool SynacorVM::step() {
   }
 
   return true;
-}
-
-int main() {
-  string in_line;
-
-  SynacorVM vm("challenge.bin");
-  cout << vm.execute("");
-
-  while (getline(cin, in_line)) {
-    if (in_line == "undo") {
-      cout << vm.undo();
-    } else {
-      cout << vm.execute(in_line);
-    }
-  }
 }

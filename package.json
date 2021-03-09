@@ -2,20 +2,28 @@
   "name": "synacor-js",
   "version": "0.1.0",
   "private": true,
+  "gypfile": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.7.1",
+    "bindings": "^1.5.0",
+    "node-addon-api": "*",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-graph-vis": "^1.0.7",
     "react-scripts": "4.0.2",
+    "vis-network": "^9.0.3",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "node server --exec nodemon",
+    "dev": "run-p server start"
   },
   "eslintConfig": {
     "extends": [
@@ -36,6 +44,10 @@
     ]
   },
   "devDependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.1.5"
   }
 }
