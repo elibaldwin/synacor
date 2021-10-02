@@ -5,6 +5,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## How to run
 
 npm run server
+
 (in a separate terminal instance)
+
 npm start
 
