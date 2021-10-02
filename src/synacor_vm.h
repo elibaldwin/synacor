@@ -16,6 +16,7 @@ using std::vector;
 using std::istringstream;
 using std::ostringstream;
 
+// All the information that needs to be stored to preserve a VM state
 struct snapshot {
   string command, output;
   uint16_t ip, sp;
@@ -52,7 +53,7 @@ class SynacorVM {
     string undo();                   // make one step back into state history
     string getState();               // get current string representing state
     string reset();                  // reset to first history state, return initial message
-    string revert(int step);
+    string revert(int step);         // revert to a specific time-step in the state history
   
   private:
     bool step();

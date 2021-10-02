@@ -131,12 +131,14 @@ uint16_t SynacorVM::get(uint16_t addr) {
 }
 
 bool SynacorVM::step() {
+
   if (used_teleporter) {
-    if (ip == 5451) {
+    // secret sauce to make the teleporter work
+    if (ip == 5451) { // insert the correct energy level into the final register
       reg[7] = 25734;
     }
 
-    if (ip == 5489) {
+    if (ip == 5489) { // skip over the confirmation algorithm
       reg[0] = 6;
       ip+=2;
     }
